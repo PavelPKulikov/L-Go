@@ -3,19 +3,31 @@ body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
-  background: #f8f8f8;
+  background: #f5f5f5;
 }
 .container {
   height: 100vh;
   display: flex;
+  flex-direction: column;
+  gap: 12px;
   justify-content: center;
   align-items: center;
+  padding: 20px;
+}
+input {
+  width: 90%;
+  max-width: 500px;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
 }
 button {
-  font-size: 20px;
-  padding: 15px 30px;
+  font-size: 18px;
+  padding: 12px 24px;
   background: #e0e0e0;
   border: none;
   border-radius: 10px;
   cursor: pointer;
+  min-width: 200px;
 }
