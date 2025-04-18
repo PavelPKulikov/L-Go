@@ -7,34 +7,31 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css" />
   <script>
-    async function runGeocoding() {
-      const runBtn = document.getElementById("run-btn");
+    function runGeocoding() {
       const input = document.getElementById("sheet-link");
+      const btn = document.getElementById("run-btn");
+      const base = "https://script.google.com/macros/s/AKfycbzoSPntHBFxCeQUJy4MRTcfAsAiQq2faZ9bn-Fq7Y0MqBtVMu9PbSyD6QCwEqF_wt9G/exec";
+      const url = base + "?link=" + encodeURIComponent(input.value);
 
-      const url = "https://script.google.com/macros/s/AKfycbzoSPntHBFxCeQUJy4MRTcfAsAiQq2faZ9bn-Fq7Y0MqBtVMu9PbSyD6QCwEqF_wt9G/exec";
+      btn.disabled = true;
+      btn.textContent = "⏳ Trwa geokodowanie...";
 
-      runBtn.disabled = true;
-      runBtn.textContent = "⏳ Trwa geokodowanie...";
-
-      try {
-        const response = await fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ link: input.value })
-        });
-
-        const text = await response.text();
-        runBtn.textContent = text.includes("✅") ? "✅ Gotowe!" : text;
-      } catch (e) {
-        runBtn.textContent = "❌ Błąd sieci";
-      }
+      // открываем в новой вкладке, чтобы обойти CORS
+      window.open(url, "_blank");
     }
   </script>
 </head>
 <body>
   <div class="container">
-    <input type="text" id="sheet-link" placeholder="Wklej link do arkusza Google..." />
-    <button id="run-btn" onclick="runGeocoding()">▶️ Uruchom geokodowanie</button>
+    <input
+      type="text"
+      id="sheet-link"
+      placeholder="Wklej link do arkusza Google…" />
+    <button
+      id="run-btn"
+      onclick="runGeocoding()">
+      ▶️ Uruchom geokodowanie
+    </button>
     <a href="map.html" id="map-link">🗺️ Zobacz mapę</a>
   </div>
 </body>
