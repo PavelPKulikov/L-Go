@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Карта точек</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
+  <link rel="stylesheet" href="map-style.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+</head>
+<body>
+  <div id="map"></div>
+  <button id="submit-btn" onclick="submitSelection()">Продолжить с выбранными</button>
+
+  <script>
+    const map = L.map('map').setView([52.2297, 21.0122], 11); // Warsaw
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OSM contributors'
+    }).addTo(map);
+
+    // Example points; replace with your JSON or dynamic data.
+    const points = [
+      { id: 1, label: "Точка 1", lat: 52.23, lon: 21.01 },
+      { id: 2, label: "Точка 2", lat: 52.25, lon: 21.03 },
+      { id: 3, label: "Точка 3", lat: 52.22, lon: 21.00 }
+    ];
+
+    const selected = new Set();
+
+    points.forEach(point => {
+      const marker = L.circleMarker([point.lat, point.lon], {
+        radius: 10,
+        color: "#3388ff",
+        fillColor: "#3388ff",
+        fillOpacity: 0.8
+      }).addTo(map).bindPopup(point.label);
+
+      marker.on('click', () => {
+        if (selected.has(point.id)) {
+          selected.delete(point.id);
+          marker.setStyle({ color: "#3388ff", fillColor: "#3388ff" });
+        } else {
+          selected.add(point.id);
+          marker.setStyle({ color: "#ff5733", fillColor: "#ff5733" });
+        }
+      });
+    });
+
+    function submitSelection() {
+      alert("Вы выбрали точки: " + Array.from(selected).join(", "));
+    }
+  </script>
+</body>
+</html>
