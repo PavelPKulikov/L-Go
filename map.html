@@ -48,6 +48,35 @@
 
     const scriptUrl = 'https://script.google.com/macros/s/AKfycbzoSPntHBFxCeQUJy4MRTcfAsAiQq2faZ9bn-Fq7Y0MqBtVMu9PbSyD6QCwEqF_wt9G/exec?mode=json';
 
+    points.forEach((p, index) => {
+  if (p.lat != null && p.lng != null) {
+    const key = `${p.lat},${p.lng}`;
+
+    const numberIcon = L.divIcon({
+      className: 'number-icon',
+      html: `<div class="circle" data-key="${key}">${index + 1}</div>`,
+      iconSize: [30, 30],
+      iconAnchor: [15, 30],
+      popupAnchor: [0, -30]
+    });
+
+    const marker = L.marker([p.lat, p.lng], { icon: numberIcon }).addTo(map);
+    marker.bindPopup(p.name || 'Bez nazwy');
+
+    marker.on('click', () => {
+      const element = document.querySelector(`.circle[data-key="${key}"]`);
+      if (selected.has(key)) {
+        selected.delete(key);
+        element.classList.remove('selected');
+      } else {
+        selected.set(key, p);
+        element.classList.add('selected');
+      }
+    });
+  }
+});
+
+
     fetch(scriptUrl)
       .then(res => res.json())
       .then(points => {
