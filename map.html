@@ -13,10 +13,12 @@
       margin: 0;
       padding: 0;
     }
+
     #map {
       height: 100%;
       width: 100%;
     }
+
     .number-icon .circle {
       background-color: #007bff;
       color: white;
@@ -29,6 +31,11 @@
       text-align: center;
       border: 2px solid white;
       box-shadow: 0 0 3px rgba(0,0,0,0.3);
+    }
+
+    .circle.selected {
+      background-color: orange !important;
+      border: 2px solid #000;
     }
   </style>
 </head>
@@ -46,19 +53,20 @@
       attribution: '© OpenStreetMap'
     }).addTo(map);
 
+    const selected = new Map();
+
     const scriptUrl = 'https://script.google.com/macros/s/AKfycbzoSPntHBFxCeQUJy4MRTcfAsAiQq2faZ9bn-Fq7Y0MqBtVMu9PbSyD6QCwEqF_wt9G/exec?mode=json';
-
-   
-
 
     fetch(scriptUrl)
       .then(res => res.json())
       .then(points => {
         points.forEach((p, index) => {
           if (p.lat != null && p.lng != null) {
+            const key = `${p.lat},${p.lng}`;
+
             const numberIcon = L.divIcon({
               className: 'number-icon',
-              html: `<div class="circle">${index + 1}</div>`,
+              html: `<div class="circle" data-key="${key}">${index + 1}</div>`,
               iconSize: [30, 30],
               iconAnchor: [15, 30],
               popupAnchor: [0, -30]
@@ -66,6 +74,17 @@
 
             const marker = L.marker([p.lat, p.lng], { icon: numberIcon }).addTo(map);
             marker.bindPopup(p.name || 'Bez nazwy');
+
+            marker.on('click', () => {
+              const element = document.querySelector(`.circle[data-key="${key}"]`);
+              if (selected.has(key)) {
+                selected.delete(key);
+                element.classList.remove('selected');
+              } else {
+                selected.set(key, p);
+                element.classList.add('selected');
+              }
+            });
           }
         });
       })
