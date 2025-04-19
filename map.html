@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>L-Go Map + Routing</title>
+  <title>L-Go Map</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Leaflet -->
@@ -39,11 +39,17 @@
       border: 2px solid #000;
     }
 
-    #route-btn {
+    .controls {
       position: absolute;
       top: 10px;
       left: 10px;
       z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .controls button {
       padding: 10px 15px;
       background: white;
       border: 1px solid #ccc;
@@ -54,7 +60,10 @@
 </head>
 <body>
   <div id="map"></div>
-  <button id="route-btn">📍 Wyznacz trasę</button>
+  <div class="controls">
+    <button id="route-btn">📍 Wyznacz trasę</button>
+    <button id="gmap-btn">🗺️ Otwórz w Google Maps</button>
+  </div>
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -121,13 +130,27 @@
 
       routeControl = L.Routing.control({
         waypoints: waypoints,
-        createMarker: () => null, // отключаем маркеры от маршрутизатора
+        createMarker: () => null,
         lineOptions: {
           styles: [{ color: 'green', weight: 4 }]
         },
         addWaypoints: false,
         draggableWaypoints: false
       }).addTo(map);
+    });
+
+    document.getElementById('gmap-btn').addEventListener('click', () => {
+      const waypoints = Array.from(selected.values());
+
+      if (waypoints.length < 2) {
+        alert('Wybierz co najmniej 2 punkty.');
+        return;
+      }
+
+      const url = 'https://www.google.com/maps/dir/' +
+        waypoints.map(p => `${p.lat},${p.lng}`).join('/');
+
+      window.open(url, '_blank');
     });
   </script>
 </body>
