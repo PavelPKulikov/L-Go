@@ -2,11 +2,12 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>L-Go Map</title>
+  <title>L-Go Map + Routing</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
   <style>
     html, body {
       height: 100%;
@@ -37,13 +38,27 @@
       background-color: orange !important;
       border: 2px solid #000;
     }
+
+    #route-btn {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+      padding: 10px 15px;
+      background: white;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      font-family: sans-serif;
+    }
   </style>
 </head>
 <body>
   <div id="map"></div>
+  <button id="route-btn">📍 Wyznacz trasę</button>
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 
   <script>
     const map = L.map('map').setView([52.2297, 21.0122], 6);
@@ -54,6 +69,7 @@
     }).addTo(map);
 
     const selected = new Map();
+    let routeControl = null;
 
     const scriptUrl = 'https://script.google.com/macros/s/AKfycbzoSPntHBFxCeQUJy4MRTcfAsAiQq2faZ9bn-Fq7Y0MqBtVMu9PbSyD6QCwEqF_wt9G/exec?mode=json';
 
@@ -87,10 +103,32 @@
             });
           }
         });
-      })
-      .catch(err => {
-        console.error('Ошибка загрузки данных:', err);
       });
+
+    document.getElementById('route-btn').addEventListener('click', () => {
+      if (routeControl) {
+        map.removeControl(routeControl);
+      }
+
+      const waypoints = Array.from(selected.values()).map(p =>
+        L.latLng(p.lat, p.lng)
+      );
+
+      if (waypoints.length < 2) {
+        alert('Wybierz co najmniej 2 punkty, aby wyznaczyć trasę.');
+        return;
+      }
+
+      routeControl = L.Routing.control({
+        waypoints: waypoints,
+        createMarker: () => null, // отключаем маркеры от маршрутизатора
+        lineOptions: {
+          styles: [{ color: 'green', weight: 4 }]
+        },
+        addWaypoints: false,
+        draggableWaypoints: false
+      }).addTo(map);
+    });
   </script>
 </body>
 </html>
